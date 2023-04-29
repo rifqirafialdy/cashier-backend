@@ -5,7 +5,7 @@ const db = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Rahasia1",
-    database: "ecommerce_app",
+    database: "cashier",
     port: 3306
 })
 
