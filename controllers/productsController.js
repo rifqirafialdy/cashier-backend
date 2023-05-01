@@ -27,16 +27,17 @@ return res.status(200).send({ message: 'Product added successfully' });
 
     },
     addCategory: async (req, res) => {
-    const { name } = req.body;
+      const { category } = req.body;
+      console.log(category);
 
 try {
-  const categoryQuery = await query(`SELECT * FROM categories WHERE category_name = ${db.escape(name)}`);
+  const categoryQuery = await query(`SELECT * FROM categories WHERE category_name = ${db.escape(category)}`);
   
   if (categoryQuery.length > 0) {
     return res.status(200).send({ message: "Category already exists" });
   }
   
-  const addCategory = await query(`INSERT INTO categories VALUES (null, ${db.escape(name)})`);
+  const addCategory = await query(`INSERT INTO categories (category_name) VALUES ( ${db.escape(category)})`);
   
   return res.status(200).send({ message: "Category added" });
 } catch (err) {
@@ -101,11 +102,14 @@ try {
 
     },
     fetchProducts: async (req, res) => {
-        const { page, sort, order } = req.body;
-        console.log(sort,order);
+      let { page, sort, order, search } = req.body;
+      
       
         try {
           let productList;
+          if (typeof page !== 'number' || isNaN(page)) {
+            page = 0;
+          }
           if (sort && order) {
             let orderBy = 'name';
             let sortOrder = 'ASC';
@@ -116,10 +120,10 @@ try {
               sortOrder = 'DESC';
             }
       
-            productList = await query(`SELECT * FROM products ORDER BY ${orderBy} ${sortOrder} LIMIT 9 OFFSET ${page}`);
+            productList = await query(`SELECT * FROM products  ${search ? `WHERE name LIKE '%${search}%' AND` : ''}  ORDER BY  ${orderBy} ${sortOrder} LIMIT 9 OFFSET ${page}`);
 
           } else {
-            productList = await query(`SELECT * FROM products LIMIT 9 OFFSET ${db.escape(page)}`);
+            productList = await query(`SELECT * FROM products ${search ? `WHERE name LIKE '%${search}%' AND` : ''}  LIMIT 9 OFFSET ${page}`);
             }
             
       
@@ -162,7 +166,23 @@ try {
           console.error(error);
           return res.status(500).send({ message: 'Internal server error' });
         }
-      }
+      },
+      setIsActive: async (req, res) => {
+        const idProduct = parseInt(req.params.id);
+        const { isActive } = req.body;
+        const isActiveInt = Boolean(isActive) ? 1 : 0;
+        console.log(isActiveInt);
+    
+        try {
+          const updateQuery = `UPDATE products SET isActive = ${db.escape(isActiveInt)} WHERE product_ID = ${db.escape(idProduct)}`;
+          await query(updateQuery);
+          console.log(updateQuery);
+          return res.status(200).send({ message: 'Update successful' });
+        } catch (error) {
+          console.error(error);
+          return res.status(500).send({ message: 'Internal server error' });
+        }
+      },
       
       
     

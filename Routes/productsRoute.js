@@ -11,6 +11,7 @@ router.get('/show-categories', productsController.fetchCategories)
 router.get('/show-allproduct', productsController.fetchAllData)
 router.post('/edit-category/:id', productsController.editCategories)
 router.post('/filter-products', productsController.filterProducts)
-router.delete('/delete-product/:id',productsController.deleteProduct)
+router.delete('/delete-product/:id', productsController.deleteProduct)
+router.post('/activate/:id',productsController.setIsActive)
 
 module.exports= router
