@@ -107,6 +107,7 @@ try {
       
         try {
           let productList;
+          let productCount;
           if (typeof page !== 'number' || isNaN(page)) {
             page = 0;
           }
@@ -119,15 +120,16 @@ try {
             if (order === 'DESC') {
               sortOrder = 'DESC';
             }
-      
-            productList = await query(`SELECT * FROM products  ${search ? `WHERE name LIKE '%${search}%' AND` : ''}  ORDER BY  ${orderBy} ${sortOrder} LIMIT 9 OFFSET ${page}`);
+            productList = await query(`SELECT * FROM products  ${search ? `WHERE name LIKE '%${search}%' ` : ''}  ORDER BY  ${orderBy} ${sortOrder} LIMIT 9 OFFSET ${page}`);
+            productCount = await query(`SELECT COUNT(*) as totalCount FROM products  ${search ? `WHERE name LIKE '%${search}%' ` : ''}  ORDER BY  ${orderBy} ${sortOrder} LIMIT 9 OFFSET ${page}`);
 
           } else {
-            productList = await query(`SELECT * FROM products ${search ? `WHERE name LIKE '%${search}%' AND` : ''}  LIMIT 9 OFFSET ${page}`);
+            productList = await query(`SELECT * FROM products ${search ? `WHERE name LIKE '%${search}%' ` : ''}  LIMIT 9 OFFSET ${page}`);
+            productCount = await query(`SELECT COUNT(*) as totalCount FROM products ${search ? `WHERE name LIKE '%${search}%' ` : ''}  LIMIT 9 OFFSET ${page}`);
             }
             
-      
-          return res.status(200).send(productList);
+            // const productCount = await query('SELECT COUNT(*) as totalCount FROM products ')
+          return res.status(200).send({ productList ,productCount});
         } catch (error) {
           console.error(error);
           return res.status(500).send({ message: 'Internal server error' });
